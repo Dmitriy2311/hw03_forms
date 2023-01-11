@@ -33,6 +33,7 @@ def group_posts(request, slug):
     }
     return render(request, 'posts/group_list.html', context)
 
+
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()

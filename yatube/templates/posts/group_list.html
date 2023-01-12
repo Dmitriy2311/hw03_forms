@@ -6,20 +6,9 @@
       <div class="container py-5">
         <h1> {{ group.title }} </h1>
         <p>{{ group.description }}</p>
-        <article>
           {% for post in page_obj %}
-            <ul>      
-              <li>
-                Автор: {{ post.author.get_full_name }}
-              </li>
-              <li>
-                Дата публикации: {{ post.pub_date|date:"d E Y" }}
-              </li>
-            </ul>
-            <p>{{ post.text|linebreaks }}</p>
-          {% if not forloop.last %}<hr>{% endif %}
+            {% include "includes/post_art.html" with post=post %}
           {% endfor %}
-        </article>
         {% include 'posts/includes/paginator.html' %}
       </div>  
     {% endblock %}

@@ -1,22 +1,16 @@
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .forms import PostForm
 from .models import Post, Group, User
-
-
-POST_LIMIT = 10
+from .utils import paginat
 
 
 def index(request):
     post_list = Post.objects.all()
-    paginator = Paginator(post_list, POST_LIMIT)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginat(request, post_list)
     context = {
         'page_obj': page_obj,
-        'paginator': paginator,
     }
     return render(request, 'posts/index.html', context)
 
@@ -24,9 +18,7 @@ def index(request):
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     post_list = group.posts.all()
-    paginator = Paginator(post_list, POST_LIMIT)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = page_obj = paginat(request, post_list)
     context = {
         'group': group,
         'page_obj': page_obj,
@@ -37,9 +29,7 @@ def group_posts(request, slug):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()
-    paginator = Paginator(post_list, POST_LIMIT)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginat(request, post_list)
     context = {
         'author': author,
         'page_obj': page_obj,
@@ -54,14 +44,19 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
-    form = PostForm(request.POST or None)
-    if form.is_valid():
-        post = form.save(commit=False)
-        post.author = request.user
-        post.save()
-        return redirect('posts:profile', request.user)
+    form = PostForm(data=request.POST)
 
-    return render(request, 'posts/create_post.html', {'form': form})
+    if request.method != 'POST':
+        form = PostForm()
+        return render(request, 'posts/create_post.html', {'form': form})
+
+    if not form.is_valid():
+        return render(request, 'posts/create_post.html', {'form': form})
+
+    post = form.save(commit=False)
+    post.author = request.user
+    post.save()
+    return redirect('posts:profile', post.author)
 
 
 @login_required

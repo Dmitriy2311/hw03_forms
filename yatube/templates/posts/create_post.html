@@ -9,7 +9,10 @@
             {% if is_edit %}Редактировать запись{% else %}Добавить запись{% endif %}             
           </div>
           <div class="card-body">
-            {% include 'includes/post_error.html' %} 
+            {% include 'includes/post_error.html' %}
+            <form method="post" action="{{ request.get_full_path }}">
+              {% csrf_token %}
+            {% include 'includes/post_form.html' %} 
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">
                   {% if is_edit %}

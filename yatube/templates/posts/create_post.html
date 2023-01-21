@@ -12,7 +12,9 @@
             {% include 'includes/post_error.html' %}
             <form method="post" action="{{ request.get_full_path }}">
               {% csrf_token %}
-            {% include 'includes/post_form.html' %} 
+            {% for field in form %}
+            {% include 'includes/post_form.html' %}
+            {% endfor %} 
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">
                   {% if is_edit %}
